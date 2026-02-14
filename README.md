@@ -256,6 +256,7 @@ This project was built as a demonstration of how blockchain technology can solve
 
 If you want to contribute or have ideas, feel free to open an issue or PR.
 
+
 ## 📄 License
 
 MIT
