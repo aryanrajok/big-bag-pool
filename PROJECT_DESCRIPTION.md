@@ -12,6 +12,7 @@ Traditional event ticketing suffers from high upfront costs and lack of social e
 
 ## Platform Architecture
 
+
 ### Smart Contract Structure
 
 The project employs a **factory-based architecture** with separate contracts for each pool type:
