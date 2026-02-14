@@ -10,7 +10,7 @@ TLOOT takes a different approach. Instead of buying tickets alone, users pool th
 
 ## 🎮 How it works
 
-We support two ways to participate:
+We support two ways to participate
 
 ### 1. Commit-to-Claim Pools
 The straightforward one. Users contribute to a pool (anywhere from 1 USDT up to 80% of what's remaining). Once the pool fills up and the ticket is secured, participants complete their payment before the event. It's kind of like a group reservation system.
