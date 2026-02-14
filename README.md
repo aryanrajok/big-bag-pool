@@ -260,11 +260,3 @@ If you want to contribute or have ideas, feel free to open an issue or PR.
 
 MIT
 
-## 📚 Additional Documentation
-
-- [PROJECT_DESCRIPTION.md](./PROJECT_DESCRIPTION.md) - Comprehensive technical documentation
-- [DEPLOYMENT_GUIDE.md](./DEPLOYMENT_GUIDE.md) - Step-by-step deployment instructions
-
----
-
-**Built with ❤️ on Etherlink**
