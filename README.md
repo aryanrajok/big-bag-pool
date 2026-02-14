@@ -15,7 +15,7 @@ We support two ways to participate
 ### 1. Commit-to-Claim Pools
 The straightforward one. Users contribute to a pool (anywhere from 1 USDT up to 80% of what's remaining). Once the pool fills up and the ticket is secured, participants complete their payment before the event. It's kind of like a group reservation system   .
 
-If someone doesn't pay up, their initial commitment is redistributed as token rewards to everyone else. Fair's fair.
+If someone doesn't pay up, their initial commitment is redistributed as token rewards to everyone else. Fair's fair fair .
 
 **Key Features:**
 - Variable contribution amounts (minimum 1 USDT, maximum 80% of remaining)
