@@ -41,4 +41,4 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-NIGRATION_SUMMARY.MD
+MIGRATION_SUMMARY.md
