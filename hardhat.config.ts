@@ -1,50 +1,28 @@
-import hardhatToolboxViemPlugin from "@nomicfoundation/hardhat-toolbox-viem";
-import { defineConfig } from "hardhat/config";
+import "@nomicfoundation/hardhat-toolbox-viem";
+import { HardhatUserConfig } from "hardhat/config";
 import * as dotenv from "dotenv";
 
 dotenv.config({ path: ".env.local" });
 
-export default defineConfig({
-  plugins: [hardhatToolboxViemPlugin],
+const config: HardhatUserConfig = {
   solidity: {
-    profiles: {
-      default: {
-        version: "0.8.28",
-        settings: {
-          optimizer: {
-            enabled: true,
-            runs: 200,
-          },
-          viaIR: true,
-        },
+    version: "0.8.28",
+    settings: {
+      optimizer: {
+        enabled: true,
+        runs: 200,
       },
-      production: {
-        version: "0.8.28",
-        settings: {
-          optimizer: {
-            enabled: true,
-            runs: 200,
-          },
-          viaIR: true,
-        },
-      },
+      viaIR: true,
     },
   },
   networks: {
-    hardhatMainnet: {
-      type: "edr-simulated",
-      chainType: "l1",
-    },
-    hardhatOp: {
-      type: "edr-simulated",
-      chainType: "op",
-    },
-    mantleSepolia: {
+    etherlinkTestnet: {
       type: "http",
-      chainType: "l1",
-      url: "https://rpc.sepolia.mantle.xyz",
-      chainId: 5003,
+      url: process.env.ETHERLINK_RPC_URL || "",
+      chainId: 127823,
       accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
     },
   },
-});
+};
+
+export default config;

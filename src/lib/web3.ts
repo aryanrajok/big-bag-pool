@@ -1,24 +1,24 @@
 import { http, createConfig } from "wagmi";
-import { MANTLE_TESTNET, CONTRACT_ADDRESSES } from "./constants";
+import { ETHERLINK_TESTNET, CONTRACT_ADDRESSES } from "./constants";
 import { SIMPLE_POOL_MANAGER_ABI, USDT_ABI } from "./abis";
 import { QueryClient } from "@tanstack/react-query";
 import { connectorsForWallets } from "@rainbow-me/rainbowkit";
 import { metaMaskWallet, rainbowWallet, walletConnectWallet } from "@rainbow-me/rainbowkit/wallets";
 
 // Define the chain configuration
-const mantleSepoliaChain = {
-  id: 5003,
-  name: "Mantle Sepolia Testnet",
+const etherlinkTestnetChain = {
+  id: 127823,
+  name: "Etherlink Shadownet",
   nativeCurrency: {
     decimals: 18,
-    name: "Mantle",
-    symbol: "MNT",
+    name: "XTZ",
+    symbol: "XTZ",
   },
   rpcUrls: {
-    default: { http: ["https://rpc.sepolia.mantle.xyz"] },
+    default: { http: [process.env.NEXT_PUBLIC_ETHERLINK_RPC_URL || "https://node.shadownet.etherlink.com"] },
   },
   blockExplorers: {
-    default: { name: "Mantle Testnet Explorer", url: "https://sepolia.mantlescan.xyz" },
+    default: { name: "Etherlink Explorer", url: "https://explorer.etherlink.com" },
   },
   testnet: true,
 } as const;
@@ -41,10 +41,10 @@ const connectors = connectorsForWallets(
 
 // Wagmi Configuration
 export const config = createConfig({
-  chains: [mantleSepoliaChain],
+  chains: [etherlinkTestnetChain],
   connectors,
   transports: {
-    [mantleSepoliaChain.id]: http("https://rpc.sepolia.mantle.xyz"),
+    [etherlinkTestnetChain.id]: http(process.env.NEXT_PUBLIC_ETHERLINK_RPC_URL || "https://node.shadownet.etherlink.com"),
   },
   ssr: true, // Enable SSR mode
 });

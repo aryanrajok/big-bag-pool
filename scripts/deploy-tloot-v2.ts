@@ -1,5 +1,6 @@
-import { network } from "hardhat";
+import "@nomicfoundation/hardhat-toolbox-viem";
 import { formatEther } from "viem";
+import hre from "hardhat";
 
 /**
  * Deploy Complete System: PlatformTokenV2 + Factories with MINTER_ROLE
@@ -7,15 +8,14 @@ import { formatEther } from "viem";
  */
 
 async function main() {
-  console.log("🚀 Deploying Complete Pool System with TLOOT V2 to Mantle Sepolia...\n");
+  console.log("🚀 Deploying Complete Pool System with TLOOT V2 to Etherlink Shadownet...\n");
 
-  const { viem } = await network.connect();
-  const [deployer] = await viem.getWalletClients();
-  const publicClient = await viem.getPublicClient();
-  
+  const [deployer] = await hre.viem.getWalletClients();
+  const publicClient = await hre.viem.getPublicClient();
+
   console.log("Deploying with account:", deployer.account.address);
   const balance = await publicClient.getBalance({ address: deployer.account.address });
-  console.log("Account balance:", formatEther(balance), "MNT\n");
+  console.log("Account balance:", formatEther(balance), "XTZ\n");
 
   // Existing contracts
   const MOCK_USDT = "0x59a2fB83F0f92480702EDEE8f84c72a1eF44BD9b";
@@ -29,23 +29,23 @@ async function main() {
   console.log("");
 
   // Step 1: Deploy PlatformTokenV2 (TLOOT)
-  console.log("=" .repeat(60));
+  console.log("=".repeat(60));
   console.log("STEP 1: Deploy PlatformTokenV2 (TLOOT)");
-  console.log("=" .repeat(60));
+  console.log("=".repeat(60));
   console.log("");
   console.log("📦 Deploying PlatformTokenV2...");
-  const tloot = await viem.deployContract("PlatformTokenV2", []);
+  const tloot = await hre.viem.deployContract("PlatformTokenV2", []);
   console.log("✅ PlatformTokenV2 deployed to:", tloot.address);
   console.log("");
 
   // Step 2: Deploy Factories
-  console.log("=" .repeat(60));
+  console.log("=".repeat(60));
   console.log("STEP 2: Deploy Factory Contracts");
-  console.log("=" .repeat(60));
+  console.log("=".repeat(60));
   console.log("");
-  
+
   console.log("📦 Deploying LuckyDrawFactory...");
-  const ldFactory = await viem.deployContract("LuckyDrawFactory", [
+  const ldFactory = await hre.viem.deployContract("LuckyDrawFactory", [
     MOCK_USDT,
     tloot.address,
     SUPRA_ROUTER,
@@ -55,7 +55,7 @@ async function main() {
   console.log("");
 
   console.log("📦 Deploying CommitToClaimFactory...");
-  const ctcFactory = await viem.deployContract("CommitToClaimFactory", [
+  const ctcFactory = await hre.viem.deployContract("CommitToClaimFactory", [
     MOCK_USDT,
     tloot.address,
     adminAddress,
@@ -64,9 +64,9 @@ async function main() {
   console.log("");
 
   // Step 3: Grant MINTER_ROLE to factories
-  console.log("=" .repeat(60));
+  console.log("=".repeat(60));
   console.log("STEP 3: Grant MINTER_ROLE and ADMIN_ROLE to Factories");
-  console.log("=" .repeat(60));
+  console.log("=".repeat(60));
   console.log("");
 
   console.log("🔑 Granting MINTER_ROLE to LuckyDrawFactory...");
@@ -123,9 +123,9 @@ async function main() {
   console.log("");
 
   // Step 4: Verify permissions
-  console.log("=" .repeat(60));
+  console.log("=".repeat(60));
   console.log("STEP 4: Verify Permissions");
-  console.log("=" .repeat(60));
+  console.log("=".repeat(60));
   console.log("");
 
   const isLDMinter = await publicClient.readContract({
@@ -147,9 +147,9 @@ async function main() {
   console.log("");
 
   // Summary
-  console.log("=" .repeat(60));
+  console.log("=".repeat(60));
   console.log("🎉 DEPLOYMENT COMPLETE");
-  console.log("=" .repeat(60));
+  console.log("=".repeat(60));
   console.log("");
   console.log("New Contracts:");
   console.log("- TLOOT Token (V2):        ", tloot.address);

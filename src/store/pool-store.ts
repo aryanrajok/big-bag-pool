@@ -1,9 +1,8 @@
 import { create } from "zustand";
 import { Pool, PoolFilters, CreatePoolInput } from "@/types";
-import { PoolType, PoolStatus, CONTRACT_ADDRESSES } from "@/lib/constants";
+import { PoolType, PoolStatus, CONTRACT_ADDRESSES, ETHERLINK_TESTNET } from "@/lib/constants";
 import { SIMPLE_POOL_MANAGER_ABI, USDT_ABI } from "@/lib/abis";
-import { createPublicClient, createWalletClient, custom, http, parseUnits, decodeEventLog } from "viem";
-import { mantleSepoliaTestnet } from "wagmi/chains";import { getPoolMetadata } from "@/lib/pool-metadata";
+import { createPublicClient, createWalletClient, custom, http, parseUnits, decodeEventLog } from "viem"; import { getPoolMetadata } from "@/lib/pool-metadata";
 interface PoolStore {
   pools: Pool[];
   selectedPool: Pool | null;
@@ -33,12 +32,12 @@ export const usePoolStore = create<PoolStore>((set, get) => ({
 
   loadPools: async () => {
     set({ isLoading: true });
-    
+
     try {
       // Load pools from SimplePoolManager contract
       const publicClient = createPublicClient({
-        chain: mantleSepoliaTestnet,
-        transport: http("https://rpc.sepolia.mantle.xyz"),
+        chain: ETHERLINK_TESTNET as any,
+        transport: http(process.env.NEXT_PUBLIC_ETHERLINK_RPC_URL || "https://node.shadownet.etherlink.com"),
       });
 
       // Get pool count
@@ -49,7 +48,7 @@ export const usePoolStore = create<PoolStore>((set, get) => ({
       }) as bigint;
 
       const loadedPools: Pool[] = [];
-      
+
       // Load each pool
       for (let i = 1; i <= Number(poolCount); i++) {
         try {
@@ -64,12 +63,12 @@ export const usePoolStore = create<PoolStore>((set, get) => ({
           // Get metadata if available, otherwise use defaults
           const metadata = getPoolMetadata(i.toString());
           const poolDeadline = new Date(Number(poolData.deadline) * 1000);
-          
+
           let eventDate: Date;
           let venue: string;
           let description: string;
           let category: string;
-          
+
           if (metadata) {
             eventDate = new Date(metadata.event.date);
             venue = metadata.event.venue;
@@ -84,7 +83,7 @@ export const usePoolStore = create<PoolStore>((set, get) => ({
             description = 'Event details will be shared after pool closes';
             category = poolData.poolType === 0 ? 'Entertainment' : 'Event';
           }
-          
+
           const pool: Pool = {
             id: i.toString(),
             eventId: `event-${i}`,
@@ -98,8 +97,8 @@ export const usePoolStore = create<PoolStore>((set, get) => ({
               category,
             },
             type: poolData.poolType === 0 ? PoolType.LUCKY_DRAW : PoolType.COMMIT_TO_CLAIM,
-            status: poolData.status === 0 ? PoolStatus.ACTIVE : 
-                   poolData.status === 1 ? PoolStatus.COMPLETED : PoolStatus.CANCELLED,
+            status: poolData.status === 0 ? PoolStatus.ACTIVE :
+              poolData.status === 1 ? PoolStatus.COMPLETED : PoolStatus.CANCELLED,
             targetAmount: Number(poolData.ticketPrice) / 1e6,
             currentAmount: Number(poolData.totalPooled) / 1e6,
             maxParticipants: Number(poolData.maxParticipants),
@@ -133,7 +132,7 @@ export const usePoolStore = create<PoolStore>((set, get) => ({
 
   getFilteredPools: () => {
     const { pools, filters } = get();
-    
+
     return pools.filter((pool) => {
       if (filters.type && pool.type !== filters.type) return false;
       if (filters.status && pool.status !== filters.status) return false;
@@ -157,27 +156,27 @@ export const usePoolStore = create<PoolStore>((set, get) => ({
       pools: state.pools.map((pool) =>
         pool.id === poolId
           ? {
-              ...pool,
-              currentAmount: amount,
-              currentParticipants: participants,
-            }
+            ...pool,
+            currentAmount: amount,
+            currentParticipants: participants,
+          }
           : pool
       ),
     })),
 
   createPool: async (input: CreatePoolInput): Promise<Pool> => {
     set({ isCreating: true });
-    
+
     try {
       const isCommitToClaim = input.poolType === PoolType.COMMIT_TO_CLAIM;
-      
+
       // Get wallet client
       if (typeof window === 'undefined' || !(window as any).ethereum) {
         throw new Error("Wallet not connected");
       }
 
       const walletClient = createWalletClient({
-        chain: mantleSepoliaTestnet,
+        chain: ETHERLINK_TESTNET as any,
         transport: custom((window as any).ethereum),
       });
 
@@ -188,11 +187,11 @@ export const usePoolStore = create<PoolStore>((set, get) => ({
 
       // Calculate deadline timestamp
       const deadlineTimestamp = Math.floor(Date.now() / 1000) + (input.daysUntilDeadline * 86400);
-      
+
       // Convert amounts to USDT units (6 decimals)
       const ticketPriceInUSDT = parseUnits(input.ticketPrice.toString(), 6);
       const entryAmountInUSDT = parseUnits(input.entryAmount.toString(), 6);
-      
+
       // Call SimplePoolManager.createPool
       // function createPool(PoolType poolType, string eventName, uint256 entryAmount, uint256 ticketPrice, uint256 maxParticipants, uint256 deadline)
       const hash = await walletClient.writeContract({
@@ -212,12 +211,12 @@ export const usePoolStore = create<PoolStore>((set, get) => ({
 
       // Wait for transaction confirmation
       const publicClient = createPublicClient({
-        chain: mantleSepoliaTestnet,
+        chain: ETHERLINK_TESTNET as any,
         transport: http(),
       });
 
       const receipt = await publicClient.waitForTransactionReceipt({ hash });
-      
+
       if (receipt.status !== 'success') {
         throw new Error("Transaction failed");
       }
@@ -248,7 +247,7 @@ export const usePoolStore = create<PoolStore>((set, get) => ({
       });
 
       const poolId = (decodedEvent.args as any).poolId.toString();
-      
+
       // Create the event object
       const event = {
         id: `event-${Date.now()}`,
@@ -263,7 +262,7 @@ export const usePoolStore = create<PoolStore>((set, get) => ({
       // Calculate deadlines
       const deadline = new Date();
       deadline.setDate(deadline.getDate() + input.daysUntilDeadline);
-      
+
       const paymentDeadline = new Date(input.eventDate);
       paymentDeadline.setDate(paymentDeadline.getDate() - 30); // 30 days before event
 

@@ -14,11 +14,10 @@ import { Badge } from "@/components/ui/badge";
 import { usePoolStore } from "@/store/pool-store";
 import { formatCurrency } from "@/lib/utils";
 import { format } from "date-fns";
-import { PoolType, CLAIM_FEE_PERCENTAGE, CONTRACT_ADDRESSES } from "@/lib/constants";
+import { PoolType, CLAIM_FEE_PERCENTAGE, CONTRACT_ADDRESSES, ETHERLINK_TESTNET } from "@/lib/constants";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
 import { createWalletClient, createPublicClient, custom, http, parseUnits } from "viem";
-import { mantleSepoliaTestnet } from "viem/chains";
 import { SIMPLE_POOL_MANAGER_ABI, USDT_ABI } from "@/lib/abis";
 
 export default function PoolDetailPage() {
@@ -26,7 +25,7 @@ export default function PoolDetailPage() {
   const poolId = params?.id as string;
   const { pools, loadPools, getPoolById } = usePoolStore();
   const [isJoining, setIsJoining] = useState(false);
-  
+
   useEffect(() => {
     if (pools.length === 0) {
       loadPools();
@@ -34,7 +33,7 @@ export default function PoolDetailPage() {
   }, [pools.length, loadPools]);
 
   const pool = poolId ? getPoolById(poolId) : null;
-  
+
   // Calculate values (safe to do before early return check)
   const progressPercentage = pool ? (pool.currentAmount / pool.targetAmount) * 100 : 0;
   const spotsLeft = pool ? pool.maxParticipants - pool.currentParticipants : 0;
@@ -43,10 +42,10 @@ export default function PoolDetailPage() {
   const odds = isLuckyDraw && pool && pool.currentParticipants > 0
     ? ((1 / pool.currentParticipants) * 100).toFixed(2)
     : "0";
-  
+
   // Calculate remaining amount for Commit to Claim
   const remainingAmount = pool ? pool.targetAmount - pool.currentAmount : 0;
-  
+
   if (!pool) {
     if (pools.length === 0) {
       return <div style={{ padding: "48px", textAlign: "center" }}>Loading...</div>;
@@ -56,10 +55,10 @@ export default function PoolDetailPage() {
 
   const handleJoinPool = async () => {
     if (isJoining) return;
-    
+
     try {
       setIsJoining(true);
-      
+
       // Get wallet client
       if (typeof window === 'undefined' || !(window as any).ethereum) {
         toast.error("Please connect your wallet first");
@@ -67,7 +66,7 @@ export default function PoolDetailPage() {
       }
 
       const walletClient = createWalletClient({
-        chain: mantleSepoliaTestnet,
+        chain: ETHERLINK_TESTNET as any,
         transport: custom((window as any).ethereum),
       });
 
@@ -78,13 +77,13 @@ export default function PoolDetailPage() {
       }
 
       const publicClient = createPublicClient({
-        chain: mantleSepoliaTestnet,
-        transport: http("https://rpc.sepolia.mantle.xyz"),
+        chain: ETHERLINK_TESTNET as any,
+        transport: http(process.env.NEXT_PUBLIC_ETHERLINK_RPC_URL || "https://node.shadownet.etherlink.com"),
       });
 
       // Use fixed entry amount for both pool types
       const amountToContribute = pool.entryAmount;
-      
+
       // Convert entry amount to USDT units (6 decimals)
       const entryAmountInUSDT = parseUnits(amountToContribute.toString(), 6);
 
@@ -135,13 +134,13 @@ export default function PoolDetailPage() {
       });
 
       await publicClient.waitForTransactionReceipt({ hash: joinHash });
-      
+
       toast.success("Successfully joined pool! You received TLOOT tokens.");
-      
+
       // Reload pools to get updated data
       setIsJoining(true); // Keep button disabled while reloading
       await loadPools();
-      
+
       // Small delay to ensure state updates
       setTimeout(() => setIsJoining(false), 500);
     } catch (error: any) {
@@ -425,10 +424,10 @@ export default function PoolDetailPage() {
                     onClick={handleJoinPool}
                     disabled={progressPercentage >= 100 || isJoining}
                   >
-                    {isJoining 
-                      ? "Joining..." 
-                      : progressPercentage >= 100 
-                        ? "Pool Filled" 
+                    {isJoining
+                      ? "Joining..."
+                      : progressPercentage >= 100
+                        ? "Pool Filled"
                         : `Join for ${formatCurrency(pool.entryAmount)}`}
                   </Button>
 
