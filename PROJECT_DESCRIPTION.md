@@ -73,7 +73,7 @@ The project also includes **SimplePoolManager.sol**, a unified contract that man
 - Unlimited participants
 - Instant TLOOT token rewards (1:1 with USDT contribution)
 - No debt beyond deadline - all payments complete before event
-- Automatic pool finalization when fully funded
+- Automatic pool finalization when fully funded to the
 
 ### 2. Lucky Draw Pools
 
