@@ -1,8 +1,8 @@
-# TLOOT - GameFi Social Ticketing Platform
+## TLOOT - GameFi Social Ticketing Platform
 
 A blockchain-based GameFi platform that democratizes access to premium event tickets through collaborative pool funding and lucky draw mechanics. Built on **Etherlink Shadownet Testnet**.
 
-## 🎯 What's this about?
+## 🎯 What's this about ?
 
 Let's be honest - premium event tickets are expensive. Whether it's that concert you've been wanting to see or a sports game, dropping hundreds of dollars upfront isn't always feasible.
 
